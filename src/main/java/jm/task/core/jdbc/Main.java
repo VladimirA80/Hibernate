@@ -1,48 +1,34 @@
 package jm.task.core.jdbc;
+//import jm.task.core.jdbc.util;
 
-//import com.mysql.jdbc.FabricMySQLDriver;
+import jm.task.core.jdbc.dao.UserDao;
+import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
+import jm.task.core.jdbc.util.Util;
 
-import com.mysql.cj.jdbc.Driver;
-
-import java.sql.*;
-
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Main {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/usersdb";
-    private static final String USER = "root";
-    private static final String PASSWORD = "root";
-
-
     public static void main(String[] args) {
 
+        Util.getConnection();
+        UserDao userDao = new UserDaoJDBCImpl();
 
-        Connection connection = null;
+        userDao.createUsersTable();
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            //Driver driver = new FabricMySQLDriver();
-            //DriverManager.registerDriver(driver);
-            if (connection != null && !connection.isClosed()) {
-                System.out.println("Соединение с БД установлено!");
+        userDao.saveUser("Name1", "LastName1", (byte) 20);
+        userDao.saveUser("Name2", "LastName2", (byte) 25);
+        userDao.saveUser("Name3", "LastName3", (byte) 31);
+        userDao.saveUser("Name4", "LastName4", (byte) 38);
+
+        userDao.removeUserById(1);
+        userDao.getAllUsers();
+        userDao.cleanUsersTable();
+        userDao.dropUsersTable();
+    }
 
 
-            }
-        } catch (ClassNotFoundException e) {
-            System.err.println("Драйвер БД не найден: " + e.getMessage());
-        } catch (SQLException e) {
-            System.err.println("Не удалось загрузить класс драйвера");
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    System.out.println("Соединение с БД закрыто.");
-                } catch (SQLException e) {
-                    System.err.println("Ошибка при закрытии соединения: " + e.getMessage());
-                }
-            }
-        }
 
     }
-}
+
