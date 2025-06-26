@@ -2,6 +2,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import jm.task.core.jdbc.util.Util;
 import java.sql.ResultSet;
@@ -100,13 +101,13 @@ public class UserDaoJDBCImpl implements UserDao {
             }
         } catch (SQLException e) {
             System.err.println("Ошибка при получении списка пользователей: " + e.getMessage());
-            throw new RuntimeException(e);
+            return Collections.emptyList();
         }
         return users;
     }
 
     public void cleanUsersTable() {
-        String sql = "TRUNCATE TABLE users";
+        String sql = "DELETE FROM users";
 
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
