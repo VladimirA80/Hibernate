@@ -22,8 +22,9 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void createUsersTable() {
         Transaction transaction = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
 
             String sql = """
@@ -35,23 +36,30 @@ public class UserDaoHibernateImpl implements UserDao {
                     )
                     """;
 
+
             session.createNativeQuery(sql).executeUpdate();
             transaction.commit();
             System.out.println("Таблица users создана");
         } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
+            transaction.rollback();
             System.err.println("Ошибка создания таблицы: " + e.getMessage());
-
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    System.err.println("Ошибка при закрытии сессии: " + e.getMessage());
+                }
+            }
         }
     }
 
     @Override
     public void dropUsersTable() {
         Transaction transaction = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
 
             String sql = "DROP TABLE IF EXISTS users";
@@ -61,10 +69,16 @@ public class UserDaoHibernateImpl implements UserDao {
             System.out.println("Таблица users удалена");
 
         } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
+            transaction.rollback();
+            System.err.println("Ошибка создания таблицы: " + e.getMessage());
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    System.err.println("Ошибка при закрытии сессии: " + e.getMessage());
+                }
             }
-            System.err.println("Ошибка удаления таблицы: " + e.getMessage());
         }
     }
 
@@ -72,7 +86,9 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction transaction = null;
-        try {Session session = sessionFactory.openSession();
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
 
             User user = new User(name, lastName, age);
@@ -81,18 +97,25 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
             System.out.println("Пользователь " + name + " " + lastName + " успешно сохранен");
         } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
+            transaction.rollback();
             System.err.println("Ошибка при сохранении пользователя: " + e.getMessage());
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    System.err.println("Ошибка при закрытии сессии: " + e.getMessage());
+                }
+            }
         }
     }
 
     @Override
     public void removeUserById(long id) {
-         Transaction transaction = null;
+        Transaction transaction = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
 
             User user = session.get(User.class, id);
@@ -108,18 +131,24 @@ public class UserDaoHibernateImpl implements UserDao {
             }
 
         } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
+            transaction.rollback();
+            System.err.println("Ошибка при сохранении пользователя: " + e.getMessage());
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    System.err.println("Ошибка при закрытии сессии: " + e.getMessage());
+                }
             }
-            System.err.printf("Ошибка при удалении пользователя с ID %d: %s%n",
-                    id, e.getMessage());
         }
     }
 
     @Override
     public List<User> getAllUsers() {
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
 
             String hql = "FROM User";
 
@@ -131,14 +160,23 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e) {
             System.err.println("Ошибка при получении пользователей: " + e.getMessage());
             return Collections.emptyList();
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    System.err.println("Ошибка при закрытии сессии: " + e.getMessage());
+                }
+            }
         }
     }
 
     @Override
     public void cleanUsersTable() {
         Transaction transaction = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
 
             String deleteSql = "DELETE FROM users";
@@ -147,10 +185,16 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
             System.out.println("Таблица users очищена");
         } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
+            transaction.rollback();
+            System.err.println("Ошибка при сохранении пользователя: " + e.getMessage());
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    System.err.println("Ошибка при закрытии сессии: " + e.getMessage());
+                }
             }
-            System.err.println("Ошибка очистки таблицы: " + e.getMessage());
         }
     }
 }
